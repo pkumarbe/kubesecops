@@ -1,0 +1,2 @@
+etcd put course "kube security"
+etcd get course
