@@ -1,5 +1,6 @@
 etcd put course "kube security"
 etcd get course
 =====
-secure by client authentication.
+secure by client authentication https certificate.
 use flag = --client-cert-auth and --trusted-ca-file
+tls bad certificate
