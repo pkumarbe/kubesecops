@@ -4,3 +4,9 @@ etcd get course
 secure by client authentication https certificate.
 use flag = --client-cert-auth and --trusted-ca-file
 tls bad certificate
+----------------
+etcd arugments
+--cert-file = <path> => certs used for SSL/TLS connections to etc
+--key-file = <path> => key for certificate
+--advertise-client-urls  => Address etcd server bnds accepting incoming requests.
+--listen-client-urls => etcd clients or other members used to contact etcd server
