@@ -1,0 +1,5 @@
+Few Encryption Providers..
+1. Identity -  None
+2. aescbc - AES-CBC with PKCS#7 padding
+3. secretbox - XSalsa20 and Poly1305
+4. kms - USes envelope encryption scheme
