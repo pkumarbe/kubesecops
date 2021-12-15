@@ -1,1 +1,14 @@
 --insecure-port=0 => stop access usinng 8080 (local)
+Authenication
+-----------------
+X509 client certificates
+static token file
+
+Authentication ---> Authorization ---> Admission Controllers.
+-------
+Authorozation Modes..
+1. AlwaysDeny - Block all
+2. AlwaysAllow - Allow all
+3. RBAC - is widely used, uses policies using the K8s API
+4. Node - some special permission.
+
