@@ -1,4 +1,43 @@
+This document is about the process to create self sign SSL certificate.
+
 CA - Certificate Authority.
 CSR- Certificate Signing Request.
 CN- Common Name.
 crt  - certificate
+
+Commands-
+1. Create a private key for CA
+# openssl genrsa -out ca.key 2048
+2. Create a CSR
+# openssl req -new -key ca.key -subj "/CN=kubernetes-CA" -out ca.csr
+3. Self sigm the CSR
+#openssl x509 -req -in ca.csr --signkey ca.key -CAcreateserial -out ca.crt -days 1000
+Signature ok
+subject=CN = kubernetes-CA
+Getting Private key
+------------------------------------------------------------
+# ls -ltr
+-rwxrwxrwx 1 prasant prasant 1675 Dec 15 18:53 ca.key
+-rwxrwxrwx 1 prasant prasant  895 Dec 15 18:54 ca.csr
+-rwxrwxrwx 1 prasant prasant 1001 Dec 15 18:56 ca.crt
+* We don't need ca.csr and it can be removed.
+Next create you required certificates with above CA.
+
+# openssl genrsa -out prasant.key 2048
+# openssl req -new -key prasant.key -subj "/CN=prasant/O=admins" -out prasant.csr
+#openssl x509 -req -in prasant.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out prasant.crt -days 1000
+ca.key -CAcreateserial -out prasant.crt -days 1000
+Signature ok
+subject=CN = prasant, O = admins
+Getting CA Private Key
+-------------------------------------
+# ls -ltr
+total 24
+-rwxrwxrwx 1 prasant prasant 1675 Dec 15 18:34 prasant.key
+-rwxrwxrwx 1 prasant prasant  911 Dec 15 18:35 prasant.csr
+-rwxrwxrwx 1 prasant prasant 1675 Dec 15 18:53 ca.key
+-rwxrwxrwx 1 prasant prasant  895 Dec 15 18:54 ca.csr
+-rwxrwxrwx 1 prasant prasant 1001 Dec 15 18:56 ca.crt
+-rwxrwxrwx 1 prasant prasant   41 Dec 15 19:01 ca.srl
+-rwxrwxrwx 1 prasant prasant 1017 Dec 15 19:01 prasant.crt
+
