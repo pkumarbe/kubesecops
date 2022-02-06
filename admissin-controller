@@ -1,0 +1,36 @@
+https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#what-does-each-admission-controller-do 
+list of admission controllers..
+              (NamespaceLifecycle, LimitRanger, ServiceAccount, TaintNodesByCondition, PodSecurity, Priority, DefaultTolerationSeconds, DefaultStorageClass, StorageObjectInUseProtection, PersistentVolumeClaimResize, RuntimeClass, CertificateApproval, CertificateSigning, CertificateSubjectRestriction, DefaultIngressClass, MutatingAdmissionWebhook, ValidatingAdmissionWebhook, ResourceQuota)
+              
+** PodNodeSelector 
+This admission controller defaults and limits what node selectors may be used within a namespace by reading a namespace annotation and a global configuration.
+
+add below in `/etc/kubernetes/manifests/kube-apiserver.yaml`
+ - --admission-control-config-file=/etc/kubernetes/adm-control/admission-control.yaml
+ 
+# cat admission-control.yaml 
+
+podNodeSelectorPluginConfig:
+  clusterDefaultNodeSelector: "env=development"
+  production: "env=production"
+  development:
+  noannotation: "env=notpresent"
+
+================= Prepare the Nodes (kubelets)
+
+$ kubectl label node kubedev01 env=development
+$ kubectl label node kubeprod01 env=production
+
+================= Prepare the Namespaces
+
+# Create the namespaces
+kubectl create ns production
+kubectl create ns development
+kubectl patch namespace production -p '{"metadata":{"annotations":{"scheduler.alpha.kubernetes.io/node-selector":"env=production"}}}'
+kubectl patch namespace development -p '{"metadata":{"annotations":{"scheduler.alpha.kubernetes.io/node-selector":"env=development"}}}'
+
+================= Deploy Pod
+kubectl run -n production nginx --image=nginx 
+kubectl run -n development nginx --image=nginx 
+
+
