@@ -1,0 +1,2 @@
+change context = 
+kubectl config set-context --current --namespace=pw-config
