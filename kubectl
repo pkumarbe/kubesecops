@@ -1,2 +1,4 @@
 change context = 
 kubectl config set-context --current --namespace=<my-ns>
+use context runtime =
+kubectl --kubeconfig=/etc/kubernetes/kubelet.conf get po
