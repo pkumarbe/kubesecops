@@ -1,0 +1,55 @@
+We can use nfs provisnor to use NFS storage class.
+How it works -
+  It does not create NFS server insteas it uses a running NFS servers.
+  This provisioner runs in a container that mounts an NFS export from an existing NFS server—it does not run an NFS server itself.
+  With the container, it listens for PVCs that match its storage class, creates directories within the NFS export, and reports each directory to Kubernetes as a persistent volume
+  It is dynamic. No need to create PV. PVC can claimed directly.
+
+Source - https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner
+
+We can use the helm or manifests to deploy.
+
+$ helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
+
+$ helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner --set nfs.server=10.136.18.220 --set nfs.path=/opt/nfsshare
+
+
+[root@k8s-master0 ~]# helm list
+NAME                            NAMESPACE       REVISION        UPDATED                                 STATUS          CHART                                   APP VERSION
+ingress-nginx                   default         1               2022-05-20 07:11:40.466460254 +0000 UTC deployed        ingress-nginx-3.23.0                    0.44.0
+nfs-subdir-external-provisioner default         1               2022-06-09 12:46:34.740373858 +0000 UTC deployed        nfs-subdir-external-provisioner-4.0.16  4.0.2
+[root@pk8s-master0 ~]#
+[root@k8s-master0 ~]#
+[root@k8s-master0 ~]# kubectl get sc
+NAME         PROVISIONER                                     RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
+nfs-client   cluster.local/nfs-subdir-external-provisioner   Delete          Immediate           true                   9s
+[root@k8s-master0 ~]#
+====
+# cat test-pvc-from-provison
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: test-claim
+spec:
+  storageClassName: nfs-client
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Mi
+=====================
+ kubectl get pv,pvc
+No resources found in default namespace.
+[root@k8s-master0 ~]# kubectl apply -f test-pvc-from-provison
+persistentvolumeclaim/test-claim created
+[root@k8s-master0 ~]# kubectl get pv,pvc
+NAME                                                        CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                STORAGECLASS   REASON   AGE
+persistentvolume/pvc-14c4bbb7-a23e-4319-94d3-5c1ca799beb9   1Mi        RWX            Delete           Bound    default/test-claim   nfs-client              2s
+
+NAME                               STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+persistentvolumeclaim/test-claim   Bound    pvc-14c4bbb7-a23e-4319-94d3-5c1ca799beb9   1Mi        RWX            nfs-client     2s
+[root@k8s-master0 ~]#
+
+=====
+
+
