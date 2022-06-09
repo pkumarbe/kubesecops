@@ -1,0 +1,73 @@
+NFS as a persistance storage class in Kubernetes.
+===============
+1. Make sure we have runinng NFS server.
+Ex- 
+[root@pk8s-worker0 ~]#cat /etc/exports
+/opt/nfsshare *(rw,sync,no_root_squash)
+
+[root@pk8s-worker0 ~]# showmount -e
+Export list for k8s-worker0:
+/opt/nfsshare *
+
+#====================== Create PV
+nfs pv-
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-nfs-pv1
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: <IP or URL of the NFS Server>
+    path: "/opt/nfsshare" (The directory name which is shared)
+#==================================
+#nfs pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-nfs-pv1
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Mi
+#==================================
+#nfs pv deplpoyment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: nginx
+  name: nginx-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: nginx
+  template:
+    metadata:
+      labels:
+        run: nginx
+    spec:
+      volumes:
+      - name: www
+        persistentVolumeClaim:
+          claimName: pvc-nfs-pv1
+      containers:
+      - image: nginx
+        name: nginx
+        volumeMounts:
+        - name: www
+          mountPath: /usr/share/nginx/html
+
