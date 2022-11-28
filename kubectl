@@ -2,3 +2,7 @@ change context =
 kubectl config set-context --current --namespace=<my-ns>
 use context runtime =
 kubectl --kubeconfig=/etc/kubernetes/kubelet.conf get po
+delete a terminate state namespace=
+ NS=`kubectl get ns |grep Terminating | awk 'NR==1 {print $1}'` && kubectl get namespace "$NS" -o json   | tr -d "\n" | sed "s/\"finalizers\": \[[^]]\+\]/\"finalizers\": []/"   | kubectl replace --raw /api/v1/namespaces/$NS/finalize -f -
+
+
