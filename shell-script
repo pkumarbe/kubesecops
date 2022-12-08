@@ -1,0 +1,6 @@
+
+Add user with sudo access, home directory and set the password...
+ssh -i mykey ec2-user@$ip "sudo useradd -p $(openssl passwd -crypt wireless) -s /bin/bash -d /home/user1 -m -G sudo user1"
+
+Install an package on remote with sudo-
+ssh -i mykey ec2-user@$ip "sudo apt update;sudo apt  install sshpass open-iscsi nfs-common ipmitool"
