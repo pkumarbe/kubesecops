@@ -1,0 +1,2 @@
+clean all images using ctr
+ctr -n k8s.io i rm $(ctr -n k8s.io i ls -q )
